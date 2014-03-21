@@ -13,15 +13,20 @@ int main()
 {
 	/////////////////////////////
 	// Set up the analogue input
-	ADCSRA |= (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // Set ADC prescaler to 128 -- 125KHz sample rate @ 16MHz
+	ADCSRA |= _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0); // Set ADC prescaler to 128 -- 125KHz sample rate @ 16MHz
 
-	ADMUX |= ((1 << REFS0) | (1 << REFS1)); // Set reference voltage to 2.56V
-	ADMUX |= (1 << ADLAR); // Make the ADC left-align the values (0-255)
+	// ADMUX:	REFS1	REFS0	Refernce
+	//			0		0		External ARef
+	//			0		1		Vcc
+	//			1		1		Internal 1.1V (ATMega168/328) / 2.56V (ATMega8)
 
-	ADCSRA |= (1 << ADATE); // Enable the Analog-Digital Auto Trigger Event
+	ADMUX |= _BV(REFS0) | _BV(REFS1);
+	ADMUX |= _BV(ADLAR); // Make the ADC left-align the values. We then read bits 9 to 2 from ADCH (ignoring bits 0 and 1 in ADCL).
 
-	ADCSRA |= (1 << ADEN); // Enable the ADC
-	ADCSRA |= (1 << ADSC); // Start ADC measurements
+	ADCSRA |= _BV(ADATE); // Enable the Analog-Digital Auto Trigger Event
+
+	ADCSRA |= _BV(ADEN); // Enable the ADC
+	ADCSRA |= _BV(ADSC); // Start ADC measurements
 
 	GRB frameBuffer[40];
 	memset(frameBuffer, 0, 3 * 40);
@@ -30,7 +35,6 @@ int main()
 	memset(valBuffer, 0, 40);
 
 	uint16_t hue = 0;
-
 
 	while(1) {
 
