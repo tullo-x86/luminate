@@ -13,18 +13,23 @@ int main()
 {
     /////////////////////////////
     // Set up the analogue input
+	DDRC &= 0xC0;  // Set ADC pins as inputs
+	PORTC &= 0xC0; // Set ADC pins to not use internal pull-up
+	DIDR0 &= 0x3F; // Disable digital input buffers for all ADC pins
     ADCSRA |= _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0); // Set ADC prescaler to 128 -- 125KHz sample rate @ 16MHz
+
+    ADMUX  = _BV(MUX0); // Set ADC multiplexer to read from channel 1 (PORTC 1)
 
     // ADMUX:   REFS1   REFS0   Refernce
     //          0       0       External ARef
     //          0       1       Vcc
     //          1       1       Internal 1.1V (ATMega168/328) / 2.56V (ATMega8)
 
-    ADMUX  = _BV(MUX0); // Set ADC multiplexer to read from channel 1 (PORTC 1)
     ADMUX |= _BV(REFS0) | _BV(REFS1);
     ADMUX |= _BV(ADLAR); // Make the ADC left-align the values. We then read bits 9 to 2 from ADCH (ignoring bits 0 and 1 in ADCL).
 
     ADCSRA |= _BV(ADATE); // Enable the Analog-Digital Auto Trigger Event
+    ADCSRB = 0;			  // There should be no ADC triggers set
 
     ADCSRA |= _BV(ADEN); // Enable the ADC
     ADCSRA |= _BV(ADSC); // Start ADC measurements
@@ -38,7 +43,6 @@ int main()
     uint16_t hue = 0;
 
     while(1) {
-
         hue += 5;
         if (hue > MAX_HUE) hue = 0;
 
@@ -60,6 +64,6 @@ int main()
         }
 
         ws2812_setleds(frameBuffer, 40);
-        _delay_ms(15);
+        _delay_ms(20);
     }
 }
