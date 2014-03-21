@@ -3,22 +3,22 @@
 // Created 2014
 
 #include "light_ws2812.h"
+#include <string.h> /* memset */
 #include <util/delay.h>
 #include <avr/io.h>
 #include "hsv.h"
 
 typedef struct cRGB GRB;
 
-int main()
-{
-    /////////////////////////////
-    // Set up the analogue input
+void setupAdcOnPin(uint8_t pin) {
+	// TODO: assert pin <= 7
+
 	DDRC &= 0xC0;  // Set ADC pins as inputs
 	PORTC &= 0xC0; // Set ADC pins to not use internal pull-up
 	DIDR0 &= 0x3F; // Disable digital input buffers for all ADC pins
     ADCSRA |= _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0); // Set ADC prescaler to 128 -- 125KHz sample rate @ 16MHz
 
-    ADMUX  = _BV(MUX0); // Set ADC multiplexer to read from channel 1 (PORTC 1)
+    ADMUX  = 0x7 & pin; // Set ADC multiplexer to read from the given channel
 
     // ADMUX:   REFS1   REFS0   Refernce
     //          0       0       External ARef
@@ -28,11 +28,20 @@ int main()
     ADMUX |= _BV(REFS0) | _BV(REFS1);
     ADMUX |= _BV(ADLAR); // Make the ADC left-align the values. We then read bits 9 to 2 from ADCH (ignoring bits 0 and 1 in ADCL).
 
-    ADCSRA |= _BV(ADATE); // Enable the Analog-Digital Auto Trigger Event
-    ADCSRB = 0;			  // There should be no ADC triggers set
+    ADCSRA |= _BV(ADEN); // Power up the ADC
+}
 
-    ADCSRA |= _BV(ADEN); // Enable the ADC
+inline void adcStartConversion() {
     ADCSRA |= _BV(ADSC); // Start ADC measurements
+}
+
+int main()
+{
+    /////////////////////////////
+    // Set up the analogue input
+	setupAdcOnPin(1);
+
+	adcStartConversion(); // Start ADC measurements
 
     GRB frameBuffer[40];
     memset(frameBuffer, 0, 3 * 40);
@@ -64,6 +73,8 @@ int main()
         }
 
         ws2812_setleds(frameBuffer, 40);
-        _delay_ms(20);
+        _delay_ms(2);
+    	adcStartConversion(); // Start ADC measurements
+        _delay_ms(13);
     }
 }
