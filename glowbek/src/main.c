@@ -8,14 +8,14 @@
 #include <avr/io.h>
 #include "hsv.h"
 
-typedef struct cRGB GRB;
+typedef struct cRGB cRGB;
 
 void setupAdcOnPin(uint8_t pin) {
-	// TODO: assert pin <= 7
+    // TODO: assert pin <= 7
 
-	DDRC &= 0xC0;  // Set ADC pins as inputs
-	PORTC &= 0xC0; // Set ADC pins to not use internal pull-up
-	DIDR0 &= 0x3F; // Disable digital input buffers for all ADC pins
+    DDRC &= 0xC0;  // Set ADC pins as inputs
+    PORTC &= 0xC0; // Set ADC pins to not use internal pull-up
+    DIDR0 &= 0x3F; // Disable digital input buffers for all ADC pins
     ADCSRA |= _BV(ADPS2) | _BV(ADPS1) | _BV(ADPS0); // Set ADC prescaler to 128 -- 125KHz sample rate @ 16MHz
 
     ADMUX  = 0x7 & pin; // Set ADC multiplexer to read from the given channel
@@ -39,11 +39,11 @@ int main()
 {
     /////////////////////////////
     // Set up the analogue input
-	setupAdcOnPin(1);
+    setupAdcOnPin(1);
 
-	adcStartConversion(); // Start ADC measurements
+    adcStartConversion(); // Start ADC measurements
 
-    GRB frameBuffer[40];
+    cRGB frameBuffer[40];
     memset(frameBuffer, 0, 3 * 40);
 
     uint8_t valBuffer[40];
@@ -55,6 +55,11 @@ int main()
         hue += 5;
         if (hue > MAX_HUE) hue = 0;
 
+        // NB: Reading ADCH here assumes that we started ADC conversion at least 192
+        //     clocks ago (or 1,728 clocks if it was the first conversion after
+        //     powering up the ADC. If we can't be sure of that, we should wait for
+        //     the ADIF bit in ADCSRA to be set.
+        while (!(ADCSRA & _BV(ADIF)));
         uint16_t out = ADCH * 5 + valBuffer[39];
 
         for (int i = 39; i > 0; --i)
@@ -65,7 +70,6 @@ int main()
 
         valBuffer[0] = (out > 255) ? 255 : out;
 
-
         for (int i=0; i<40; i++) {
 
             cHSV colour = { hue + i * 19, MAX_SAT, valBuffer[i] };
@@ -73,8 +77,8 @@ int main()
         }
 
         ws2812_setleds(frameBuffer, 40);
-        _delay_ms(2);
-    	adcStartConversion(); // Start ADC measurements
+        _delay_ms(2);         // The sensor line will be noisy for a little while
+        adcStartConversion(); // Start ADC measurements
         _delay_ms(13);
     }
 }
