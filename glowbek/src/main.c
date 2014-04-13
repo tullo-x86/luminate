@@ -25,7 +25,7 @@ void setupAdcOnPin(uint8_t pin) {
     //          0       1       Vcc
     //          1       1       Internal 1.1V (ATMega168/328) / 2.56V (ATMega8)
 
-    ADMUX |= _BV(REFS0) | _BV(REFS1);
+    ADMUX |= /*_BV(REFS0) |*/ _BV(REFS1);
     ADMUX |= _BV(ADLAR); // Make the ADC left-align the values. We then read bits 9 to 2 from ADCH (ignoring bits 0 and 1 in ADCL).
 
     ADCSRA |= _BV(ADEN); // Power up the ADC
@@ -39,9 +39,9 @@ int main()
 {
     /////////////////////////////
     // Set up the analogue input
-    setupAdcOnPin(1);
+    setupAdcOnPin(0);
 
-    adcStartConversion(); // Start ADC measurements
+    adcStartConversion(); // Start ADC measurement
 
     cRGB frameBuffer[40];
     memset(frameBuffer, 0, 3 * 40);
@@ -78,7 +78,7 @@ int main()
 
         ws2812_setleds(frameBuffer, 40);
         _delay_ms(2);         // The sensor line will be noisy for a little while
-        adcStartConversion(); // Start ADC measurements
+        adcStartConversion(); // Start ADC measurement
         _delay_ms(13);
     }
 }
