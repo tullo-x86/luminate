@@ -36,7 +36,57 @@ inline void adcStartConversion() {
     ADCSRA |= _BV(ADSC); // Start ADC measurements
 }
 
-cRGB frameBuffer[40];
+inline void adcWaitReady()
+{
+    // NB: Reading ADCH assumes that we started ADC conversion at least 192
+    //     clocks ago (or 1,728 clocks if it was the first conversion after
+    //     powering up the ADC. If we can't be sure of that, we should wait for
+    //     the ADIF bit in ADCSRA to be set.
+	while (!(ADCSRA & _BV(ADIF)));
+}
+
+uint8_t findPeak(uint8_t values[], uint8_t start, uint8_t length)
+{
+    uint8_t peak = 0;
+
+    for (int i = 0; i < length; ++i)
+    {
+        uint8_t val = values[start + i];
+        peak = val > peak ? val : peak;
+    }
+    return peak;
+}
+
+#define NUM_LEDS 40
+cRGB frameBuffer[NUM_LEDS];
+
+#define WINDOW_SIZE 13
+#define HISTORY_COUNT 26
+#define WINDOW_START (HISTORY_COUNT - WINDOW_SIZE)
+#define HYSTERESIS 30
+
+uint8_t isPulseDetected(uint8_t historicalPeak, uint8_t currentPeak)
+{
+    return currentPeak > historicalPeak 
+        && (currentPeak - historicalPeak) > HYSTERESIS;
+}
+
+void debugHistoryBuffer(uint8_t historicalPeak, uint8_t currentPeak, uint8_t sampleHistory[])
+{
+    frameBuffer[0].r = historicalPeak;
+    frameBuffer[1].g = currentPeak;
+
+    frameBuffer[38].r = 
+    frameBuffer[38].g = 
+    frameBuffer[38].b = 
+        isPulseDetected(historicalPeak, currentPeak) ? 255 : 0;
+    
+
+    for (int i = 0; i < HISTORY_COUNT; ++i)
+    {
+        frameBuffer[i + 3].b = sampleHistory[i];
+    }
+}
 
 int main()
 {
@@ -46,37 +96,57 @@ int main()
 
     adcStartConversion(); // Start ADC measurement
 
-    pulseSetFrameBuffer(frameBuffer, 40);
+    pulseSetFrameBuffer(frameBuffer, NUM_LEDS);
 
     const uint8_t pulseCount = 10;
     uint8_t pulseIdx = 0;
     struct cPulse pulses[pulseCount];
     memset(pulses, 0, sizeof(struct cPulse) * pulseCount);
-    pulses[0].colour.s = MAX_SAT;
-    pulses[0].colour.v = MAX_VAL;
 
-    pulses[1].position = 20;
-    pulses[1].colour.h = MAX_HUE / 2;
-    pulses[1].colour.s = MAX_SAT;
-    pulses[1].colour.v = MAX_VAL;
+    uint8_t sampleHistory[HISTORY_COUNT];
+    memset(sampleHistory, 0, HISTORY_COUNT);
 
+    while(1)
+    {
+        // Hist = = = = =
+        // Wind       - -
+        // Copy   - -
+        for (int i = 0; i < (HISTORY_COUNT - WINDOW_SIZE); ++i)
+        {
+            sampleHistory[i] = sampleHistory[i + WINDOW_SIZE];
+        }
 
-    while(1) {
-        // NB: Reading ADCH here assumes that we started ADC conversion at least 192
-        //     clocks ago (or 1,728 clocks if it was the first conversion after
-        //     powering up the ADC. If we can't be sure of that, we should wait for
-        //     the ADIF bit in ADCSRA to be set.
-        while (!(ADCSRA & _BV(ADIF)));
+        for (int i = 0; i < WINDOW_SIZE; ++i)
+        {
+            adcStartConversion();
+            _delay_ms(1);
+            adcWaitReady();
+            sampleHistory[WINDOW_START + i] = ADCH;
+        }
+
+        uint8_t historicalPeak = findPeak(sampleHistory, 0, WINDOW_START);
+        uint8_t currentPeak = findPeak(sampleHistory, WINDOW_START, WINDOW_SIZE);
+
+        if (isPulseDetected(historicalPeak, currentPeak))
+        {
+            // Generate a new pulse
+            if (++pulseIdx > pulseCount) pulseIdx = 0;
+
+            pulses[pulseIdx].colour.h = 540;
+            pulses[pulseIdx].colour.s = MAX_SAT;
+            pulses[pulseIdx].colour.v = MAX_VAL;
+            pulses[pulseIdx].position = 0;
+        }
 
         pulseClearFrameBuffer();
-        for (int i = 0; i < pulseCount; ++i) {
+
+        for (int i = 0; i < pulseCount; ++i)
+        {
             pulseUpdate(pulses + i);
             pulseRender(pulses + i);
         }
 
-        ws2812_setleds(frameBuffer, 40);
+        ws2812_setleds(frameBuffer, 40); // Blocks for ~1.2ms
         _delay_ms(2);         // The sensor line will be noisy for a little while
-        adcStartConversion(); // Start ADC measurement
-        _delay_ms(13);
     }
 }
