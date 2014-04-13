@@ -46,48 +46,33 @@ int main()
 
     adcStartConversion(); // Start ADC measurement
 
-    // memset(frameBuffer, 0, 3 * 40);
-    // memset(valBuffer, 0, 40);
-
-    // uint16_t hue = 0;
-
-    struct cPulse pulse;
-    pulse.position = 5;
-    pulse.colour.h = MAX_HUE - 50;
-    pulse.colour.s = MAX_SAT;
-    pulse.colour.v = MAX_VAL;
-
     pulseSetFrameBuffer(frameBuffer, 40);
 
-    while(1) {
-        // hue += 5;
-        // if (hue > MAX_HUE) hue = 0;
+    const uint8_t pulseCount = 10;
+    uint8_t pulseIdx = 0;
+    struct cPulse pulses[pulseCount];
+    memset(pulses, 0, sizeof(struct cPulse) * pulseCount);
+    pulses[0].colour.s = MAX_SAT;
+    pulses[0].colour.v = MAX_VAL;
 
+    pulses[1].position = 20;
+    pulses[1].colour.h = MAX_HUE / 2;
+    pulses[1].colour.s = MAX_SAT;
+    pulses[1].colour.v = MAX_VAL;
+
+
+    while(1) {
         // NB: Reading ADCH here assumes that we started ADC conversion at least 192
         //     clocks ago (or 1,728 clocks if it was the first conversion after
         //     powering up the ADC. If we can't be sure of that, we should wait for
         //     the ADIF bit in ADCSRA to be set.
         while (!(ADCSRA & _BV(ADIF)));
-        // uint16_t out = ADCH * 5 + valBuffer[39];
-
-        // for (int i = 39; i > 0; --i)
-        // {
-        //     int v = valBuffer[i-1] - 2;
-        //     valBuffer[i] = v < 0 ? 0 : v;
-        // }
-
-        // valBuffer[0] = (out > 255) ? 255 : out;
-
-        // for (int i=0; i<40; i++) {
-
-        //     cHSV colour = { hue + i * 19, MAX_SAT, MAX_VAL / 8 };
-        //     frameBuffer[i] = hsvToRgb(&colour);
-        // }
-
-        pulseUpdate(&pulse);
 
         pulseClearFrameBuffer();
-        pulseRender(&pulse);
+        for (int i = 0; i < pulseCount; ++i) {
+            pulseUpdate(pulses + i);
+            pulseRender(pulses + i);
+        }
 
         ws2812_setleds(frameBuffer, 40);
         _delay_ms(2);         // The sensor line will be noisy for a little while
