@@ -7,6 +7,7 @@
 #include <util/delay.h>
 #include <avr/io.h>
 #include "hsv.h"
+#include "pulse.h"
 
 typedef struct cRGB cRGB;
 
@@ -35,6 +36,8 @@ inline void adcStartConversion() {
     ADCSRA |= _BV(ADSC); // Start ADC measurements
 }
 
+cRGB frameBuffer[40];
+
 int main()
 {
     /////////////////////////////
@@ -43,38 +46,48 @@ int main()
 
     adcStartConversion(); // Start ADC measurement
 
-    cRGB frameBuffer[40];
-    memset(frameBuffer, 0, 3 * 40);
+    // memset(frameBuffer, 0, 3 * 40);
+    // memset(valBuffer, 0, 40);
 
-    uint8_t valBuffer[40];
-    memset(valBuffer, 0, 40);
+    // uint16_t hue = 0;
 
-    uint16_t hue = 0;
+    struct cPulse pulse;
+    pulse.position = 5;
+    pulse.colour.h = MAX_HUE - 50;
+    pulse.colour.s = MAX_SAT;
+    pulse.colour.v = MAX_VAL;
+
+    pulseSetFrameBuffer(frameBuffer, 40);
 
     while(1) {
-        hue += 5;
-        if (hue > MAX_HUE) hue = 0;
+        // hue += 5;
+        // if (hue > MAX_HUE) hue = 0;
 
         // NB: Reading ADCH here assumes that we started ADC conversion at least 192
         //     clocks ago (or 1,728 clocks if it was the first conversion after
         //     powering up the ADC. If we can't be sure of that, we should wait for
         //     the ADIF bit in ADCSRA to be set.
         while (!(ADCSRA & _BV(ADIF)));
-        uint16_t out = ADCH * 5 + valBuffer[39];
+        // uint16_t out = ADCH * 5 + valBuffer[39];
 
-        for (int i = 39; i > 0; --i)
-        {
-            int v = valBuffer[i-1] - 2;
-            valBuffer[i] = v < 0 ? 0 : v;
-        }
+        // for (int i = 39; i > 0; --i)
+        // {
+        //     int v = valBuffer[i-1] - 2;
+        //     valBuffer[i] = v < 0 ? 0 : v;
+        // }
 
-        valBuffer[0] = (out > 255) ? 255 : out;
+        // valBuffer[0] = (out > 255) ? 255 : out;
 
-        for (int i=0; i<40; i++) {
+        // for (int i=0; i<40; i++) {
 
-            cHSV colour = { hue + i * 19, MAX_SAT, valBuffer[i] };
-            frameBuffer[i] = ToRgb(&colour);
-        }
+        //     cHSV colour = { hue + i * 19, MAX_SAT, MAX_VAL / 8 };
+        //     frameBuffer[i] = hsvToRgb(&colour);
+        // }
+
+        pulseUpdate(&pulse);
+
+        pulseClearFrameBuffer();
+        pulseRender(&pulse);
 
         ws2812_setleds(frameBuffer, 40);
         _delay_ms(2);         // The sensor line will be noisy for a little while

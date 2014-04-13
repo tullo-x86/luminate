@@ -11,17 +11,24 @@ const uint8_t MAX_VAL  = 255;
 const uint8_t MAX_SAT  = 128;
 const uint16_t MAX_HUE = 764;
 
+// memory management? lol, what's that?
 cHSV RshV(cHSV *orig, uint8_t bits) {
     cHSV adjusted = { orig->h, orig->s, orig->v >> bits };
     return adjusted;
 }
 
-cRGB ToRgb(cHSV *hsv) {
+void hsvDarkenLinear(cHSV *colour, uint8_t amount)
+{
+    colour->v = (colour->v > amount) ? colour->v - amount : 0;
+}
 
-    int16_t hue = hsv->h;
-    const int16_t sat = hsv->s,
-                  bri = hsv->v;
+cRGB hsvToRgb(cHSV *hsv)
+{
+    return hsvToRgbInt3(hsv->h, hsv->s, hsv->v);
+}
 
+cRGB hsvToRgbInt3(int16_t hue, int16_t sat, int16_t bri)
+{
     int16_t red_val, green_val, blue_val;
 
     while (hue > 764) hue -= 765;
