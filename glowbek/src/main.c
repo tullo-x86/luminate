@@ -143,7 +143,7 @@ int main()
             pulses[pulseIdx].colour.s = (MAX_SAT / 2) + (rand() % (MAX_SAT / 2));
             pulses[pulseIdx].colour.v = MAX_VAL;
             pulses[pulseIdx].position = startingPosition;
-            startingPosition -= 3;
+            startingPosition -= 1;
             if (startingPosition < 0) startingPosition += NUM_LEDS;
         }
 
