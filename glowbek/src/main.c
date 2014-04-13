@@ -132,10 +132,10 @@ int main()
             // Generate a new pulse
             if (++pulseIdx > pulseCount) pulseIdx = 0;
 
-            pulses[pulseIdx].colour.h = 540;
-            pulses[pulseIdx].colour.s = MAX_SAT;
+            pulses[pulseIdx].colour.h = rand() % MAX_HUE;
+            pulses[pulseIdx].colour.s = (MAX_SAT / 2) + (rand() % (MAX_SAT / 2));
             pulses[pulseIdx].colour.v = MAX_VAL;
-            pulses[pulseIdx].position = 0;
+            pulses[pulseIdx].position = rand() % NUM_LEDS;
         }
 
         pulseClearFrameBuffer();

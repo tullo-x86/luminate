@@ -25,6 +25,7 @@ typedef struct cRGB cRGB;
 cHSV RshV(cHSV *orig, uint8_t bits);
 
 void hsvDarkenLinear(cHSV *hsv, uint8_t amount);
+void hsvDarkenFalloff(cHSV *hsv);
 
 cRGB hsvToRgb(cHSV *hsv);
 cRGB hsvToRgbInt3(int16_t hue, int16_t sat, int16_t bri);

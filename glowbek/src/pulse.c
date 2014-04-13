@@ -18,7 +18,7 @@ void pulseClearFrameBuffer()
 
 void pulseUpdate(struct cPulse *pulse)
 {
-    hsvDarkenLinear(&(pulse->colour), 6);
+    hsvDarkenFalloff(&(pulse->colour));
 
     pulse->position++;
     if (pulse->position == fbLength)
