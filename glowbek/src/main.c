@@ -106,6 +106,8 @@ int main()
     uint8_t sampleHistory[HISTORY_COUNT];
     memset(sampleHistory, 0, HISTORY_COUNT);
 
+    int8_t startingPosition = 0;
+
     while(1)
     {
         // Hist = = = = =
@@ -135,7 +137,9 @@ int main()
             pulses[pulseIdx].colour.h = rand() % MAX_HUE;
             pulses[pulseIdx].colour.s = (MAX_SAT / 2) + (rand() % (MAX_SAT / 2));
             pulses[pulseIdx].colour.v = MAX_VAL;
-            pulses[pulseIdx].position = rand() % NUM_LEDS;
+            pulses[pulseIdx].position = startingPosition;
+            startingPosition -= 3;
+            if (startingPosition < 0) startingPosition += NUM_LEDS;
         }
 
         pulseClearFrameBuffer();
