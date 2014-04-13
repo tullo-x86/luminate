@@ -20,7 +20,7 @@ void pulseUpdate(struct cPulse *pulse)
 {
     hsvDarkenFalloff(&(pulse->colour));
 
-    pulse->position++;
+    pulse->position += (pulse->direction) ? 1 : -1;
     if (pulse->position == fbLength)
     {
         pulse->position = 0;

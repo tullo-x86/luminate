@@ -103,6 +103,11 @@ int main()
     struct cPulse pulses[pulseCount];
     memset(pulses, 0, sizeof(struct cPulse) * pulseCount);
 
+    for (int i = 0; i < pulseCount; i += 2)
+    {
+        pulses[i].direction = 1;
+    }
+
     uint8_t sampleHistory[HISTORY_COUNT];
     memset(sampleHistory, 0, HISTORY_COUNT);
 

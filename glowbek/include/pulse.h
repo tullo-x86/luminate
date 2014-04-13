@@ -7,6 +7,7 @@
 struct cPulse {
     cHSV colour;
     uint8_t position;
+    uint8_t direction;
 };
 
 void pulseSetFrameBuffer(struct cRGB framebuffer[], uint8_t length);
