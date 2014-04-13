@@ -24,7 +24,7 @@ void hsvDarkenLinear(cHSV *colour, uint8_t amount)
 
 void hsvDarkenFalloff(cHSV *colour)
 {
-    colour->v = (colour->v * 240UL) >> 8;
+    colour->v = (colour->v * 230UL) >> 8;
 }
 
 cRGB hsvToRgb(cHSV *hsv)

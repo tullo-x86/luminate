@@ -61,9 +61,9 @@ uint8_t findPeak(uint8_t values[], uint8_t start, uint8_t length)
 cRGB frameBuffer[NUM_LEDS];
 
 #define WINDOW_SIZE 13
-#define HISTORY_COUNT 26
+#define HISTORY_COUNT 50
 #define WINDOW_START (HISTORY_COUNT - WINDOW_SIZE)
-#define HYSTERESIS 30
+#define HYSTERESIS 50
 
 uint8_t isPulseDetected(uint8_t historicalPeak, uint8_t currentPeak)
 {
@@ -119,7 +119,7 @@ int main()
         for (int i = 0; i < WINDOW_SIZE; ++i)
         {
             adcStartConversion();
-            _delay_ms(1);
+            _delay_us(500);
             adcWaitReady();
             sampleHistory[WINDOW_START + i] = ADCH;
         }
