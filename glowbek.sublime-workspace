@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"pulses",
+				"pulses"
+			],
+			[
 				"Over",
 				"overlapRatio"
 			],
@@ -47,26 +51,74 @@
 			"file": "glowbek/src/main.c",
 			"settings":
 			{
-				"buffer_size": 2497,
+				"buffer_size": 4595,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "25h + photo time",
+			"file": "/usr/lib/avr/include/util/delay.h",
 			"settings":
 			{
-				"buffer_size": 16,
+				"buffer_size": 9083,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "glowbek/src/hsv.c",
+			"settings":
+			{
+				"buffer_size": 1518,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "glowbek/include/hsv.h",
+			"settings":
+			{
+				"buffer_size": 580,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "glowbek/src/pulse.c",
+			"settings":
+			{
+				"buffer_size": 1086,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "glowbek/src/rgb.c",
+			"settings":
+			{
+				"buffer_size": 262,
 				"line_ending": "Unix",
-				"name": "25h + photo time"
+				"name": "// rgb.c"
 			}
 		}
 	],
 	"build_system": "",
 	"command_palette":
 	{
-		"height": 96.0,
+		"height": 75.0,
 		"selected_items":
 		[
+			[
+				"ssc+",
+				"Set Syntax: C++"
+			],
+			[
+				"build",
+				"Build: Cancel"
+			],
+			[
+				"comme",
+				"Toggle Comment"
+			],
+			[
+				"open",
+				"View: Toggle Open Files in Side Bar"
+			],
 			[
 				"spaces",
 				"Indentation: Convert to Spaces"
@@ -106,10 +158,6 @@
 			[
 				"ssopens",
 				"Set Syntax: OpenSCAD"
-			],
-			[
-				"ssc+",
-				"Set Syntax: C++"
 			],
 			[
 				"inden",
@@ -156,7 +204,7 @@
 				"Set Syntax: OpenSCAD"
 			]
 		],
-		"width": 404.0
+		"width": 392.0
 	},
 	"console":
 	{
@@ -176,6 +224,11 @@
 	},
 	"file_history":
 	[
+		"/home/tullo/circuit/setuplist.txt",
+		"/home/tullo/.bashrc",
+		"/home/tullo/Downloads/Packages.zsync",
+		"/home/tullo/sketchbook/Port-Hack-Interactive-Clock/ClockRtc/ClockRtc.ino",
+		"/home/tullo/code/git/blink2/zweiten/src/PlasmaPulsePattern.cpp",
 		"/home/tullo/code/git/glowbek/glowbek/include/light_ws2812.h",
 		"/home/tullo/code/git/glowbek/glowbek/include/hsv.h",
 		"/usr/lib/avr/include/avr/iom328p.h",
@@ -183,11 +236,9 @@
 		"/usr/lib/avr/include/avr/sleep.h",
 		"/usr/lib/avr/include/avr/io.h",
 		"/home/tullo/code/git/blink2/zweiten/include/hsv.h",
-		"/home/tullo/.bashrc",
 		"/usr/local/bin/gitex",
 		"/home/tullo/code/git/blink2/zweiten/src/hsv.cpp",
 		"/home/tullo/code/git/blink2/zweiten/src/main.cpp",
-		"/home/tullo/code/git/blink2/zweiten/src/PlasmaPulsePattern.cpp",
 		"/home/tullo/sketchbook/Port-Hack-Interactive-Clock/ClockMasterNtpClient/ClockMasterNtpClient.ino",
 		"/home/tullo/code/git/blink2/zweiten/include/PlasmaPulsePattern.h",
 		"/home/tullo/Documents/steam tcp connections",
@@ -204,7 +255,6 @@
 		"/usr/share/X11/xorg.conf.d/80-displaydpi.conf",
 		"/home/tullo/Documents/3D Printing/Triforce/lLibs.scad",
 		"/home/tullo/Documents/3D Printing/Libs.scad",
-		"/home/tullo/sketchbook/Port-Hack-Interactive-Clock/ClockRtc/ClockRtc.ino",
 		"/home/tullo/Arduino/arduino-1.0.5/arduino",
 		"/home/tullo/Arduino/DS1307RTC/DS1307RTC.cpp",
 		"/home/tullo/Arduino/DS1307RTC/DS1307RTC.h",
@@ -278,6 +328,9 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"rand",
+			"TIME_HEADER",
+			"sample",
 			"1",
 			"HSV_t",
 			"dpi",
@@ -330,24 +383,25 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2497,
+						"buffer_size": 4595,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								3525,
+								3525
 							]
 						],
 						"settings":
 						{
 							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 826.0,
+						"translation.y": 2205.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
@@ -355,30 +409,149 @@
 				},
 				{
 					"buffer": 1,
+					"file": "/usr/lib/avr/include/util/delay.h",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 16,
+						"buffer_size": 9083,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								16,
-								16
+								3561,
+								3561
 							]
 						],
 						"settings":
 						{
-							"auto_name": "25h + photo time",
-							"syntax": "Packages/Text/Plain text.tmLanguage"
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 1450.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "glowbek/src/hsv.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1518,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								568,
+								568
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "glowbek/include/hsv.h",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 580,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								474,
+								474
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": -0.0,
+						"translation.y": 189.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "glowbek/src/pulse.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1086,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								423,
+								423
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/C++/C++.tmLanguage",
+							"tab_size": 4,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 441.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "glowbek/src/rgb.c",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 262,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								259,
+								259
+							]
+						],
+						"settings":
+						{
+							"auto_name": "// rgb.c",
+							"syntax": "Packages/C++/C++.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 21.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
 					"type": "text"
 				}
 			]
@@ -415,6 +588,10 @@
 		]
 	},
 	"menu_visible": true,
+	"output.exec":
+	{
+		"height": 31.0
+	},
 	"output.find_results":
 	{
 		"height": 0.0
