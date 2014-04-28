@@ -31,3 +31,7 @@
 *.mk
 *.srec
 [Mm]akefile
+
+# gEDA tempfiles
+\#*
+*.sch~
