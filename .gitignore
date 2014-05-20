@@ -35,3 +35,4 @@
 # gEDA tempfiles
 \#*
 *.sch~
+/Debug
