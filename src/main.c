@@ -19,13 +19,18 @@ int main()
 	memset(frameBuffer, 0, NUM_LEDS * 3);
 
 	const int hueStep = MAX_HUE / NUM_LEDS;
-	for (int i=0; i<NUM_LEDS; i++)
-	{
-		struct cRGB rgb = hsvToRgbInt3(hueStep * i, MAX_SAT, MAX_VAL);
-	}
 
+	int hueOffset = 0;
     while(1)
     {
-        ws2812_setleds(frameBuffer, 40); // Blocks for ~1.2ms
+    	if (hueOffset < 0) hueOffset += MAX_HUE;
+    	for (int i=0; i<NUM_LEDS; i++)
+    	{
+    		struct cRGB rgb = hsvToRgbInt3(hueOffset + hueStep * i, MAX_SAT, i * MAX_VAL / NUM_LEDS);
+    		memcpy(frameBuffer+i, &rgb, sizeof(struct cRGB));
+    	}
+    	hueOffset--;
+        ws2812_setleds(frameBuffer, 24); // Blocks for ~1.2ms
+        _delay_ms(200);
     }
 }
