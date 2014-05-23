@@ -18,7 +18,9 @@ int main()
     ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
 
     while(1) {
-    	bounce(10000UL);
+    	bounceBegin();
+    	bounce(20000UL);
+    	bounceEnd();
 
     	mesmerBegin();
     	mesmer(20000UL);

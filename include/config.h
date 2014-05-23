@@ -13,6 +13,11 @@
 #define NUM_LEDS 24
 #define MAX_BRIGHTNESS 64
 
+inline void assignGreater(unsigned char *storage, unsigned char comparison)
+{
+	if (comparison > *storage) *storage = comparison;
+}
+
 // Shouldn't modify below this line
 
 struct cRGB frameBuffer[NUM_LEDS];

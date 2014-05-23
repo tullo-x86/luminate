@@ -14,20 +14,17 @@
 
 int bounceHue = 0;
 unsigned char bouncePixBuf[NUM_LEDS];
-
-void assignGreater(unsigned char *storage, unsigned char comparison)
-{
-	if (comparison > *storage) *storage = comparison;
-}
+#define BOUNCE_MAX_BRIGHTNESS 127
+unsigned char bounceBrightness = 0;
 
 int bounceFalloff(int pulsePosition, int pixelIndex)
 {
 	int difference = (pixelIndex << 8) - pulsePosition;
 
 	long long falloff = ((long long)difference * difference / 1024);
-	if (falloff > 127) return 0;
+	if (falloff > bounceBrightness) return 0;
 
-	return 127 - falloff;
+	return bounceBrightness - falloff;
 }
 
 void bounceRenderBouncer(int position) {
@@ -57,7 +54,7 @@ int truePosition = 0;
 int reflectionPosition = NUM_LEDS << 7;
 int hasReflection = 1;
 
-void bounceRender()
+inline void bounceRender()
 {
 	memset(bouncePixBuf, 0, sizeof(unsigned char) * NUM_LEDS);
 	bounceRenderBouncer(truePosition);
@@ -75,7 +72,7 @@ void bounceRender()
 
 int direction = 1;
 
-void bounceMove()
+inline void bounceMove()
 {
 	truePosition += 8 * direction;
 	if(truePosition >= (NUM_LEDS << 8))
@@ -90,7 +87,7 @@ void bounceMove()
 		reflectionPosition += (NUM_LEDS << 8);
 }
 
-void bounceLogic()
+inline void bounceLogic()
 {
 	if (++bounceHue >= MAX_HUE) bounceHue -= MAX_HUE;
 
@@ -111,18 +108,35 @@ void bounceLogic()
 void bounce(unsigned long lengthMs)
 {
 	unsigned long time = 0;
-    while(time < lengthMs)
+    while(time < lengthMs
+    	|| hasReflection)
     {
     	bounceLogic();
     	bounceRender();
 
-        _delay_ms(1);
-        time += 2; // wow, so divide, much cycle
+        _delay_ms(4);
+        time += 5; // wow, so divide, much cycle
     }
 }
 
 void bounceBegin() {
+	bounceBrightness = 0;
+    while(++bounceBrightness < BOUNCE_MAX_BRIGHTNESS)
+    {
+    	bounceLogic();
+    	hasReflection = 0;
+    	bounceRender();
+
+        _delay_ms(4);
+    }
 }
 
 void bounceEnd() {
+    while(--bounceBrightness > 0)
+    {
+    	bounceLogic();
+    	bounceRender();
+
+        _delay_ms(4);
+    }
 }
