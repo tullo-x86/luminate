@@ -10,11 +10,8 @@
 #include "hsv.h"
 #include <string.h> /* memset */
 #include <util/delay.h>
+#include <stdlib.h>
 
-const unsigned int bounceFrameMs = 20;
-
-// Position is an 8.8 fixed point value.
-int truePosition = (18 << 8) + 1;
 int bounceHue = 0;
 
 int bounceFalloff(int pulsePosition, int pixelIndex)
@@ -28,8 +25,6 @@ int bounceFalloff(int pulsePosition, int pixelIndex)
 }
 
 void bounceRender(int position) {
-	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
-
 	int initialPixel = position >> 8;
 	frameBuffer[initialPixel] = hsvToRgbInt3(bounceHue, MAX_SAT, bounceFalloff(position, initialPixel));
 
@@ -49,25 +44,65 @@ void bounceRender(int position) {
 		nextPixel++;
 		val = bounceFalloff(position, nextPixel);
 	}
-
-    ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
 }
 
 void bounceBegin() {
 }
 
-void bounce(unsigned long lengthMs) {
+const unsigned int bounceFrameMs = 2;
 
+// Position is an 8.8 fixed point value.
+int truePosition = 0;
+int reflectionPosition = NUM_LEDS << 7;
+
+int direction = 1;
+int hasReflection = 1;
+
+void bounceMove()
+{
+	truePosition += 8 * direction;
+	if(truePosition >= (NUM_LEDS << 8))
+		truePosition -= (NUM_LEDS << 8);
+	else if(truePosition <= 0)
+		truePosition += (NUM_LEDS << 8);
+
+	reflectionPosition -= 8 * direction;
+	if(reflectionPosition >= (NUM_LEDS << 8))
+		reflectionPosition -= (NUM_LEDS << 8);
+	else if(reflectionPosition <= 0)
+		reflectionPosition += (NUM_LEDS << 8);
+}
+
+void bounceLogic()
+{
+	if(hasReflection == 0)
+	{
+		hasReflection = (rand() & 0xFF) == 0xFF;
+		if (hasReflection) reflectionPosition = truePosition;
+	}
+	else if (truePosition == reflectionPosition)
+	{
+		hasReflection = 0;
+		if((rand() & 0x3) == 0x3) direction *= -1;
+	}
+
+	bounceMove();
+}
+
+void bounce(unsigned long lengthMs)
+{
 	unsigned long time = 0;
     while(time < lengthMs)
     {
     	if (++bounceHue >= MAX_HUE) bounceHue -= MAX_HUE;
 
-    	truePosition += 8;
-    	if(truePosition >= (24 << 8))
-    		truePosition = 0;
+    	bounceLogic();
 
+    	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
     	bounceRender(truePosition);
+    	if (hasReflection) bounceRender(reflectionPosition);
+
+        ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
 
         _delay_ms(bounceFrameMs);
         time += bounceFrameMs;
