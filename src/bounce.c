@@ -11,30 +11,19 @@
 #include <string.h> /* memset */
 #include <util/delay.h>
 
-const unsigned int bounceFrameMs = 5;
+const unsigned int bounceFrameMs = 25;
 
 // Position is an 8.8 fixed point value.
-int position = (2 << 8) + 1;
+int position = (18 << 8) + 1;
 
 int bounceFalloff(int pulsePosition, int pixelPosition)
 {
 	int difference = pixelPosition - pulsePosition;
-	if (difference < 0) difference = -difference;
 
-	int brightness = MAX_BRIGHTNESS;
+	long long falloff = ((long long)difference * difference / 1024);
+	if (falloff > 255) return 0;
 
-	// For each full pixel the pulse is away from the pixel, falloff by 1/4.
-	while(difference > 0xFF)
-	{
-		brightness >>= 2;
-		difference -= 256;
-	}
-
-	// Now do the fraction part!
-
-	// Linearly interpolate the last step
-	int brightnessRemnant = 256 - difference;
-	return brightness * brightnessRemnant / 256;
+	return 255 - falloff;
 }
 
 void bounceRender() {
@@ -72,7 +61,7 @@ void bounce(unsigned long lengthMs) {
     {
     	position++;
     	if(position > (22 << 8))
-    		position = (2 << 8);
+    		position = (18 << 8);
     	bounceRender();
         _delay_ms(bounceFrameMs);
         time += bounceFrameMs;
