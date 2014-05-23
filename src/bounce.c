@@ -46,6 +46,7 @@ void bounceRender() {
 	{
 		// true:  	Centre pixel at fullbright, iterate falloff to +1/-1
 		int centrePixel = position >> 8;
+		if ((position & 0xFF) > 0x7F) centrePixel++;
 		frameBuffer[centrePixel] = hsvToRgbInt3(hue, MAX_SAT, bounceFalloff(position, (centrePixel) << 8));
 
 		frameBuffer[centrePixel + 1] = hsvToRgbInt3(hue, MAX_SAT, bounceFalloff(position, (centrePixel + 1) << 8));
