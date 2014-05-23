@@ -13,6 +13,12 @@
 #include <stdlib.h>
 
 int bounceHue = 0;
+unsigned char bouncePixBuf[NUM_LEDS];
+
+void assignGreater(unsigned char *storage, unsigned char comparison)
+{
+	if (comparison > *storage) *storage = comparison;
+}
 
 int bounceFalloff(int pulsePosition, int pixelIndex)
 {
@@ -24,14 +30,14 @@ int bounceFalloff(int pulsePosition, int pixelIndex)
 	return 127 - falloff;
 }
 
-void bounceRender(int position) {
+void bounceRenderBouncer(int position) {
 	int initialPixel = position >> 8;
-	frameBuffer[initialPixel] = hsvToRgbInt3(bounceHue, MAX_SAT, bounceFalloff(position, initialPixel));
+	assignGreater(bouncePixBuf + initialPixel, bounceFalloff(position, initialPixel));
 
 	int nextPixel = initialPixel + 1;
 	int val = bounceFalloff(position, nextPixel);
 	while (val > 0) {
-		frameBuffer[nextPixel % 24] = hsvToRgbInt3(bounceHue, MAX_SAT, val);
+		assignGreater(bouncePixBuf + (nextPixel % 24), val);
 		nextPixel++;
 		val = bounceFalloff(position, nextPixel);
 	}
@@ -40,16 +46,24 @@ void bounceRender(int position) {
 	val = bounceFalloff(position, nextPixel);
 	while (val > 0) {
 		int pixelIdx = nextPixel < 0 ? nextPixel + 24 : nextPixel;
-		frameBuffer[pixelIdx] = hsvToRgbInt3(bounceHue, MAX_SAT, val);
+		assignGreater(bouncePixBuf + pixelIdx, val);
 		nextPixel++;
 		val = bounceFalloff(position, nextPixel);
+	}
+}
+
+void bounceRender()
+{
+	for (int i = 0; i < NUM_LEDS; i++)
+	{
+		frameBuffer[i] = hsvToRgbInt3(bounceHue, MAX_SAT, bouncePixBuf[i]);
 	}
 }
 
 void bounceBegin() {
 }
 
-const unsigned int bounceFrameMs = 2;
+const unsigned int bounceFrameMs = 0;
 
 // Position is an 8.8 fixed point value.
 int truePosition = 0;
@@ -98,9 +112,12 @@ void bounce(unsigned long lengthMs)
 
     	bounceLogic();
 
+    	memset(bouncePixBuf, 0, sizeof(unsigned char) * NUM_LEDS);
+    	bounceRenderBouncer(truePosition);
+    	if (hasReflection) bounceRenderBouncer(reflectionPosition);
+
     	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
-    	bounceRender(truePosition);
-    	if (hasReflection) bounceRender(reflectionPosition);
+    	bounceRender();
 
         ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
 
