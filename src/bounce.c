@@ -11,14 +11,16 @@
 #include <string.h> /* memset */
 #include <util/delay.h>
 
-const unsigned int bounceFrameMs = 25;
+const unsigned int bounceFrameMs = 1;
 
 // Position is an 8.8 fixed point value.
 int position = (18 << 8) + 1;
+int bounceHue = 0;
 
-int bounceFalloff(int pulsePosition, int pixelPosition)
+int bounceFalloff(int pulsePosition, int pixelIndex)
 {
-	int difference = pixelPosition - pulsePosition;
+
+	int difference = (pixelIndex << 8) - pulsePosition;
 
 	long long falloff = ((long long)difference * difference / 1024);
 	if (falloff > 255) return 0;
@@ -28,24 +30,25 @@ int bounceFalloff(int pulsePosition, int pixelPosition)
 
 void bounceRender() {
 	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
-	int hue = MAX_HUE / 3 * 2;
 
-	// Is position dead on a single pixel?
-	if(1)// ((position & 0xFF) == 0)
-	{
-		// true:  	Centre pixel at fullbright, iterate falloff to +1/-1
-		int centrePixel = position >> 8;
-		if ((position & 0xFF) > 0x7F) centrePixel++;
-		frameBuffer[centrePixel] = hsvToRgbInt3(hue, MAX_SAT, bounceFalloff(position, (centrePixel) << 8));
+	int initialPixel = position >> 8;
+	frameBuffer[initialPixel] = hsvToRgbInt3(bounceHue, MAX_SAT, bounceFalloff(position, initialPixel));
 
-		frameBuffer[centrePixel + 1] = hsvToRgbInt3(hue, MAX_SAT, bounceFalloff(position, (centrePixel + 1) << 8));
-		frameBuffer[centrePixel - 1] = hsvToRgbInt3(hue, MAX_SAT, bounceFalloff(position, (centrePixel - 1) << 8));
-		frameBuffer[centrePixel + 2] = hsvToRgbInt3(hue, MAX_SAT, bounceFalloff(position, (centrePixel + 2) << 8));
-		frameBuffer[centrePixel - 2] = hsvToRgbInt3(hue, MAX_SAT, bounceFalloff(position, (centrePixel - 2) << 8));
+	int nextPixel = initialPixel + 1;
+	int val = bounceFalloff(position, nextPixel);
+	while (val > 0) {
+		frameBuffer[nextPixel % 24] = hsvToRgbInt3(bounceHue, MAX_SAT, val);
+		nextPixel++;
+		val = bounceFalloff(position, nextPixel);
 	}
-	else
-	{
-		// false:	Iterate falloff to -1, -2 then +1, +2
+
+	nextPixel = initialPixel - 1;
+	val = bounceFalloff(position, nextPixel);
+	while (val > 0) {
+		int pixelIdx = nextPixel < 0 ? nextPixel + 24 : nextPixel;
+		frameBuffer[pixelIdx] = hsvToRgbInt3(bounceHue, MAX_SAT, val);
+		nextPixel++;
+		val = bounceFalloff(position, nextPixel);
 	}
 
     ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
@@ -59,9 +62,10 @@ void bounce(unsigned long lengthMs) {
 	unsigned long time = 0;
     while(time < lengthMs)
     {
-    	position++;
-    	if(position > (22 << 8))
-    		position = (18 << 8);
+    	if (++bounceHue >= MAX_HUE) bounceHue -= MAX_HUE;
+    	position += 8;
+    	if(position >= (24 << 8))
+    		position = 0;
     	bounceRender();
         _delay_ms(bounceFrameMs);
         time += bounceFrameMs;
