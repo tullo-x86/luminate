@@ -11,24 +11,23 @@
 #include <string.h> /* memset */
 #include <util/delay.h>
 
-const unsigned int bounceFrameMs = 1;
+const unsigned int bounceFrameMs = 20;
 
 // Position is an 8.8 fixed point value.
-int position = (18 << 8) + 1;
+int truePosition = (18 << 8) + 1;
 int bounceHue = 0;
 
 int bounceFalloff(int pulsePosition, int pixelIndex)
 {
-
 	int difference = (pixelIndex << 8) - pulsePosition;
 
 	long long falloff = ((long long)difference * difference / 1024);
-	if (falloff > 255) return 0;
+	if (falloff > 127) return 0;
 
-	return 255 - falloff;
+	return 127 - falloff;
 }
 
-void bounceRender() {
+void bounceRender(int position) {
 	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
 
 	int initialPixel = position >> 8;
@@ -63,10 +62,13 @@ void bounce(unsigned long lengthMs) {
     while(time < lengthMs)
     {
     	if (++bounceHue >= MAX_HUE) bounceHue -= MAX_HUE;
-    	position += 8;
-    	if(position >= (24 << 8))
-    		position = 0;
-    	bounceRender();
+
+    	truePosition += 8;
+    	if(truePosition >= (24 << 8))
+    		truePosition = 0;
+
+    	bounceRender(truePosition);
+
         _delay_ms(bounceFrameMs);
         time += bounceFrameMs;
     }
