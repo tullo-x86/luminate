@@ -10,13 +10,22 @@
 #include "pulse.h"
 #include "config.h"
 #include "mesmer.h"
+#include "bounce.h"
 
 int main()
 {
-    while(1)
+	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
+    ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
+
+    while(1) {
+    	bounce(10000UL);
+    }
+
+/*
+    while(1) {}
     {
     	mesmerBegin();
     	mesmer(10000UL);
     	mesmerEnd();
-    }
+    }*/
 }

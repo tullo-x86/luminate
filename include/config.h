@@ -11,7 +11,7 @@
 #include "rgb.h"
 
 #define NUM_LEDS 24
-#define MAX_BRIGHTNESS 32
+#define MAX_BRIGHTNESS 64
 
 // Shouldn't modify below this line
 
