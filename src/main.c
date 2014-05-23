@@ -19,13 +19,9 @@ int main()
 
     while(1) {
     	bounce(10000UL);
-    }
 
-/*
-    while(1) {}
-    {
     	mesmerBegin();
-    	mesmer(10000UL);
+    	mesmer(20000UL);
     	mesmerEnd();
-    }*/
+    }
 }

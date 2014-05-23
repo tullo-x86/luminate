@@ -52,25 +52,28 @@ void bounceRenderBouncer(int position) {
 	}
 }
 
+// Position is an 8.8 fixed point value.
+int truePosition = 0;
+int reflectionPosition = NUM_LEDS << 7;
+int hasReflection = 1;
+
 void bounceRender()
 {
+	memset(bouncePixBuf, 0, sizeof(unsigned char) * NUM_LEDS);
+	bounceRenderBouncer(truePosition);
+	if (hasReflection) bounceRenderBouncer(reflectionPosition);
+
+	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
+
 	for (int i = 0; i < NUM_LEDS; i++)
 	{
 		frameBuffer[i] = hsvToRgbInt3(bounceHue, MAX_SAT, bouncePixBuf[i]);
 	}
+
+    ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
 }
-
-void bounceBegin() {
-}
-
-const unsigned int bounceFrameMs = 0;
-
-// Position is an 8.8 fixed point value.
-int truePosition = 0;
-int reflectionPosition = NUM_LEDS << 7;
 
 int direction = 1;
-int hasReflection = 1;
 
 void bounceMove()
 {
@@ -89,6 +92,8 @@ void bounceMove()
 
 void bounceLogic()
 {
+	if (++bounceHue >= MAX_HUE) bounceHue -= MAX_HUE;
+
 	if(hasReflection == 0)
 	{
 		hasReflection = (rand() & 0xFF) == 0xFF;
@@ -108,22 +113,15 @@ void bounce(unsigned long lengthMs)
 	unsigned long time = 0;
     while(time < lengthMs)
     {
-    	if (++bounceHue >= MAX_HUE) bounceHue -= MAX_HUE;
-
     	bounceLogic();
-
-    	memset(bouncePixBuf, 0, sizeof(unsigned char) * NUM_LEDS);
-    	bounceRenderBouncer(truePosition);
-    	if (hasReflection) bounceRenderBouncer(reflectionPosition);
-
-    	memset(frameBuffer, 0, sizeof(struct cRGB) * NUM_LEDS);
     	bounceRender();
 
-        ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
-
-        _delay_ms(bounceFrameMs);
-        time += bounceFrameMs;
+        _delay_ms(1);
+        time += 2; // wow, so divide, much cycle
     }
+}
+
+void bounceBegin() {
 }
 
 void bounceEnd() {
