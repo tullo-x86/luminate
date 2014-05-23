@@ -26,11 +26,11 @@ int main()
     	if (hueOffset < 0) hueOffset += MAX_HUE;
     	for (int i=0; i<NUM_LEDS; i++)
     	{
-    		struct cRGB rgb = hsvToRgbInt3(hueOffset + hueStep * i, MAX_SAT, MAX_VAL / 4);
+    		struct cRGB rgb = hsvToRgbInt3(hueOffset + hueStep * i, MAX_SAT, MAX_VAL / 8);
     		memcpy(frameBuffer+i, &rgb, sizeof(struct cRGB));
     	}
     	hueOffset--;
-        ws2812_setleds(frameBuffer, 24); // Blocks for ~1.2ms
+        ws2812_setleds(frameBuffer, NUM_LEDS); // Blocks for ~0.7ms
         _delay_ms(50);
     }
 }
