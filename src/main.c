@@ -4,10 +4,6 @@
 
 #include "light_ws2812.h"
 #include <string.h> /* memset */
-#include <util/delay.h>
-#include <avr/io.h>
-#include "hsv.h"
-#include "pulse.h"
 #include "config.h"
 #include "mesmer.h"
 #include "bounce.h"
@@ -23,7 +19,7 @@ int main()
     	bounceEnd();
 
     	mesmerBegin();
-    	mesmer(20000UL);
+    	mesmer(40000UL);
     	mesmerEnd();
     }
 }

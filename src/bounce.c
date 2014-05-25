@@ -105,6 +105,13 @@ inline void bounceLogic()
 	bounceMove();
 }
 
+inline void bounceLogicNoSplit()
+{
+	if (++bounceHue >= MAX_HUE) bounceHue -= MAX_HUE;
+
+	bounceMove();
+}
+
 void bounce(unsigned long lengthMs)
 {
 	unsigned long time = 0;
@@ -134,7 +141,7 @@ void bounceBegin() {
 void bounceEnd() {
     while(--bounceBrightness > 0)
     {
-    	bounceLogic();
+    	bounceLogicNoSplit();
     	bounceRender();
 
         _delay_ms(4);

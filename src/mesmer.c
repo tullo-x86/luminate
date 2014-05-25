@@ -3,7 +3,7 @@
 #include "hsv.h"
 #include <util/delay.h>
 
-const unsigned char mesmerFrameMs = 50;
+const unsigned char mesmerFrameMs = 30;
 
 int hueOffset = 0;
 unsigned char brightness = 0;
