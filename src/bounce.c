@@ -34,7 +34,7 @@ void bounceRenderBouncer(int position) {
 	int nextPixel = initialPixel + 1;
 	int val = bounceFalloff(position, nextPixel);
 	while (val > 0) {
-		assignGreater(bouncePixBuf + (nextPixel % 24), val);
+		assignGreater(bouncePixBuf + (nextPixel % NUM_LEDS), val);
 		nextPixel++;
 		val = bounceFalloff(position, nextPixel);
 	}
@@ -42,7 +42,7 @@ void bounceRenderBouncer(int position) {
 	nextPixel = initialPixel - 1;
 	val = bounceFalloff(position, nextPixel);
 	while (val > 0) {
-		int pixelIdx = nextPixel < 0 ? nextPixel + 24 : nextPixel;
+		int pixelIdx = nextPixel < 0 ? nextPixel + NUM_LEDS : nextPixel;
 		assignGreater(bouncePixBuf + pixelIdx, val);
 		nextPixel++;
 		val = bounceFalloff(position, nextPixel);

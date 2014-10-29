@@ -10,7 +10,7 @@
 
 #include "rgb.h"
 
-#define NUM_LEDS 24
+#define NUM_LEDS 32
 #define MAX_BRIGHTNESS 64
 
 inline void assignGreater(unsigned char *storage, unsigned char comparison)
